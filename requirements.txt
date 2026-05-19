@@ -1,0 +1,6 @@
+pydantic 
+python-dotenv
+langgraph
+mem0ai
+pytest
+langgraph-checkpoint-sqlite
