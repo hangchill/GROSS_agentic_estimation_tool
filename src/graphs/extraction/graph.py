@@ -1,24 +1,95 @@
-from langgraph.graph import END, START, StateGraph
+from __future__ import annotations
 
+from langgraph.graph import END, StateGraph
+
+from src.graphs.extraction.nodes.artefacts_flows import artefacts_flows
+from src.graphs.extraction.nodes.backend_ipo import backend_ipo
 from src.graphs.extraction.nodes.feedback_template import feedback_template
 from src.graphs.extraction.nodes.ingest import ingest_inputs
+from src.graphs.extraction.nodes.pfr_merge import pfr_merge
 from src.graphs.extraction.nodes.readiness_big3 import readiness_big3
 from src.graphs.extraction.nodes.structure_scope import structure_scope
+from src.graphs.extraction.nodes.synth_unknowns import synth_unknowns
+from src.graphs.extraction.nodes.systems_interfaces import systems_interfaces
+from src.graphs.extraction.nodes.variant_axes import variant_axes
+from src.graphs.extraction.routing import route_after_readiness, route_after_synthesis
 from src.schemas.state import GrossState
 
 
-def build_extraction_subgraph() -> StateGraph:
-    extraction_graph = StateGraph(GrossState)
+def build_extraction_subgraph():
+    """
+    Build the extraction subgraph.
 
-    extraction_graph.add_node("ingest_inputs", ingest_inputs)
-    extraction_graph.add_node("structure_scope", structure_scope)
-    extraction_graph.add_node("readiness_big3", readiness_big3)
-    extraction_graph.add_node("feedback_template", feedback_template)
+    Extraction flow:
+        ingest_inputs
+        -> structure_scope
+        -> artefacts_flows
+        -> systems_interfaces
+        -> variant_axes
+        -> backend_ipo
+        -> synth_unknowns
+        -> (optional) pfr_merge
+        -> readiness_big3
+        -> (optional) feedback_template
+        -> END
 
-    extraction_graph.add_edge(START, "ingest_inputs")
-    extraction_graph.add_edge("ingest_inputs", "structure_scope")
-    extraction_graph.add_edge("structure_scope", "readiness_big3")
-    extraction_graph.add_edge("readiness_big3", "feedback_template")
-    extraction_graph.add_edge("feedback_template", END)
+    Notes:
+    - If user clarification answers exist, pfr_merge is applied after synthesis.
+    - If readiness is READY, extraction ends without generating feedback.
+    - If readiness is OPEN and max iterations are not yet reached, feedback_template
+      is generated and extraction ends in a feedback-ready state.
+    - If readiness is OPEN and max iterations are reached, extraction ends without
+      new feedback so the outer workflow can terminate.
+    """
+    g = StateGraph(GrossState)
 
-    return extraction_graph.compile()
+    # ---- extraction nodes ----
+    g.add_node("ingest_inputs", ingest_inputs)
+    g.add_node("structure_scope", structure_scope)
+    g.add_node("artefacts_flows", artefacts_flows)
+    g.add_node("systems_interfaces", systems_interfaces)
+    g.add_node("variant_axes", variant_axes)
+    g.add_node("backend_ipo", backend_ipo)
+    g.add_node("synth_unknowns", synth_unknowns)
+    g.add_node("pfr_merge", pfr_merge)
+    g.add_node("readiness_big3", readiness_big3)
+    g.add_node("feedback_template", feedback_template)
+
+    # ---- entry point ----
+    g.set_entry_point("ingest_inputs")
+
+    # ---- deterministic extraction path ----
+    g.add_edge("ingest_inputs", "structure_scope")
+    g.add_edge("structure_scope", "artefacts_flows")
+    g.add_edge("artefacts_flows", "systems_interfaces")
+    g.add_edge("systems_interfaces", "variant_axes")
+    g.add_edge("variant_axes", "backend_ipo")
+    g.add_edge("backend_ipo", "synth_unknowns")
+
+    # ---- after synthesis: decide whether to apply PFR merge ----
+    g.add_conditional_edges(
+        "synth_unknowns",
+        route_after_synthesis,
+        {
+            "pfr_merge": "pfr_merge",
+            "readiness_big3": "readiness_big3",
+        },
+    )
+
+    # ---- if PFR merge happens, re-check readiness afterwards ----
+    g.add_edge("pfr_merge", "readiness_big3")
+
+    # ---- after readiness: either generate feedback or end extraction ----
+    g.add_conditional_edges(
+        "readiness_big3",
+        route_after_readiness,
+        {
+            "feedback_template": "feedback_template",
+            "end": END,
+        },
+    )
+
+    # ---- if feedback template is generated, extraction ends here ----
+    g.add_edge("feedback_template", END)
+
+    return g.compile()
