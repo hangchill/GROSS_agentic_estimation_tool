@@ -1,35 +1,44 @@
-"""
-Checkpointing (every node) + threads ('thread_id')
+from __future__ import annotations
 
-LangGraph persistence:
-- saves a snapshot of the graph state at every step when compiled with a checkpointer
-- organizes checkpoints into threads keyed by 'thread_id'
-
-This enables human-in-the-loop pause/resume and memory across interactions
-"""
-
+import sqlite3
 from pathlib import Path
 
 from langgraph.checkpoint.sqlite import SqliteSaver
 
 
-def make_checkpointer(
+def make_sqlite_checkpointer(
     db_path: str | Path = ".checkpoints/langgraph.sqlite3",
 ) -> SqliteSaver:
     """
-    Creates a SQLite-backed checkpointer that LangGraph can use to save a snapshot of the graph state after each node (since graph is compiled with this checkpointer)
+    Create a SQLite-backed LangGraph checkpointer.
+
+    Use this in local runs / CLI.
+    In tests, pass `checkpointer=None` to the main graph instead.
+
+    Args:
+        db_path (str | Path): Path to SQLite checkpoint database.
+
+    Returns:
+        SqliteSaver: LangGraph-compatible checkpoint saver.
     """
     db_path = Path(db_path)
-    db_path.parent.mkdir(
-        parents=True, exist_ok=True
-    )  # first two lines is simply to create the checkpoints/ folder
-    return SqliteSaver.from_conn_string(
-        str(db_path)
-    )  # actual connection of database to SQLite
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+
+    conn = sqlite3.connect(str(db_path), check_same_thread=False)
+    return SqliteSaver(conn)
 
 
 def make_config(thread_id: str) -> dict:
     """
-    Simple function to create LangGraph runtime config to save/read checkpoints under this 'thread_id'
+    Create LangGraph runtime config using a thread_id.
+
+    LangGraph persistence associates checkpoints with a thread via
+    `configurable.thread_id`. 【3-fd6864】【4-0d5679】
+
+    Args:
+        thread_id (str): Workflow thread identifier.
+
+    Returns:
+        dict: LangGraph config dictionary.
     """
     return {"configurable": {"thread_id": thread_id}}
