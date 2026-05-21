@@ -1,0 +1,11 @@
+{
+    "target_dm": "HealthPlan DM",
+    "functionality_description": "User views plan",
+    "slides": [
+        {
+            "slide_index": "S1",
+            "title": "Page",
+            "text": "User views something"
+        }
+    ]
+}

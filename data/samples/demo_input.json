@@ -1,0 +1,16 @@
+{
+    "target_dm": "HealthPlan DM",
+    "functionality_description": "User views and selects a health insurance plan",
+    "slides": [
+        {
+            "slide_index": "S1",
+            "title": "Plan Listing Page",
+            "text": "User lands on a page that displays available health plans with summary details"
+        },
+        {
+            "slide_index": "S2",
+            "title": "Plan Selection",
+            "text": "User selects a plan and system retrieves plan details from Health API"
+        }
+    ]
+}
