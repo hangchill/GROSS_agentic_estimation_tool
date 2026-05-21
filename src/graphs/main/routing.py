@@ -1,56 +1,92 @@
-"""
-Functions in this file define routing conditions, allowing the graph to decide:
-- Do I need to stop the pipeline and ask the user for more info?
-- Can I proceed to the next step aka Generation?
-"""
+from __future__ import annotations
 
 from src.schemas.state import GrossState
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
-def needs_feedback(state: GrossState) -> dict:
+def needs_feedback(state: GrossState) -> bool:
     """
-    Determines whether the workflow needs user feedback before proceeding
-
-    This function inspects the extraction readiness results (Big-3 readiness check) stored
-    in the state and returns True if there are unresolved issues
-
-    A workflow requires feedback when:
-    - At least one FCU has missing membership ,implementation detail, or state (current vs to-be)
-    - There are unknowns that block accurate downstream processing
-    - readiness["any_open"] is True
+    Determine whether extraction produced unresolved readiness gaps.
 
     Args:
-        state (GrossState): The current graph state
+        state (GrossState): Current workflow state.
 
     Returns:
-        bool:
-            True -> extraction is incomplete, user input required
-            False -> extraciton is sufficiently complete to proceed
+        bool: True if readiness.any_open is True.
     """
-    readiness = state.get("readiness") or {}
-    return bool(
-        readiness.get("any_open", False)
-    )  # since convention for readiness["any_open"] is boolean
+    logger.info("[NEEDS FEEDBACK?] Determining if extraction needs feedback...")
+    readiness = state.get("readiness", {})
+    return bool(readiness.get("any_open", False))
+
+
+def max_iterations_reached(state: GrossState) -> bool:
+    """
+    Determine whether the extraction feedback loop has reached its limit.
+
+    The workflow allows feedback loops only up to the configured maximum,
+    typically 3 iterations.
+
+    Args:
+        state (GrossState): Current workflow state.
+
+    Returns:
+        bool: True if iteration >= max_iterations.
+    """
+    logger.info(
+        "[MAX ITERATIONS REACHED?] Checking if extraction has reached its limit..."
+    )
+    iteration = state.get("iteration", 1)
+    max_iterations = state.get("max_iterations", 3)
+    return iteration >= max_iterations
 
 
 def can_generate(state: GrossState) -> bool:
     """
-    Determine whether the workflow can proceed to the generation phase
+    Determine whether generation is allowed to start.
 
-    This function ensures that:
-    1. all extraciton readiness issues have been resolved
-    2. a valid "truth_pack" (Requirements Data) has been produced
-
-    Generation can only occur when:
-    - no feedback is required (rediness is fully closed)
-    - structured requirement data exists in the state
+    Generation is allowed only when:
+    - extraction does not require feedback
+    - a truth_pack exists
 
     Args:
-        state (GrossState): The current graph state
+        state (GrossState): Current workflow state.
 
     Returns:
-        bool:
-            True -> safe to proceed to generation
-            False -> must resolve extraction issues first
+        bool: True if generation can proceed.
     """
-    return not needs_feedback(state) and bool(state.get("truth_pack"))
+    logger.info("[CAN GENERATE?] Determining if generation is allowed to start...")
+    return (not needs_feedback(state)) and bool(state.get("truth_pack"))
+
+
+def route_after_extraction(state: GrossState) -> str:
+    """
+    Decide what the main graph should do after extraction.
+
+    Routing:
+    - "generation" if extraction is READY
+    - "await_user" if extraction is OPEN and iterations remain
+    - "terminate" if extraction is OPEN and max iterations reached
+
+    This matches the outer orchestration shown in the workflow:
+    extraction either loops through feedback or passes to generation,
+    and must terminate when insufficient data remains after max retries.
+
+    Args:
+        state (GrossState): Current workflow state.
+
+    Returns:
+        str: Next node label.
+    """
+    logger.info("[DECIDING ACTION POST EXTRACTION]")
+    if can_generate(state):
+        return "generation"
+
+    if needs_feedback(state) and max_iterations_reached(state):
+        return "terminate"
+
+    if needs_feedback(state):
+        return "await_user"
+
+    return "terminate"
