@@ -9,3 +9,5 @@ langchain-core
 pytest-mock
 google-generativeai
 langchain-google-genai
+mem0ai[nlp]
+fastembed
