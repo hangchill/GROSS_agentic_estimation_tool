@@ -1,323 +1,209 @@
-# GROSS Estimation Project
+# GROSS Estimation Workflow 
  
-## Overview
+## 1) Project Description
  
-This project is a GenAI-powered workflow that generates development effort estimates from high-level requirement inputs.
+This repo implements a **stateful GenAI workflow** that turns high-level requirement inputs (e.g., slide text) into **structured development effort estimates**. It does this in two main phases:
  
-In software projects:
-- A Change Request (CR) is broken into Demand Modules (DMs)
-- Each DM contains functionalities (features)
-- Each functionality needs an effort estimate
+- **Extraction**: convert unstructured requirements into structured “requirements data” (truth pack), detect gaps, and determine readiness.
+- **Generation**: produce effort groupings (worktype / complexity / count / description), apply corrections, verify, and finalize.
  
-This system automates that process using a structured workflow instead of a single prompt.
+The workflow includes a **feedback loop** when extraction is incomplete and only proceeds to generation when requirements are ready. This follows the workflow design you provided (extraction → readiness gating → generation → verification).
+---
+ 
+## 2) Quickstart 
+ 
+### 2.1 Set environment
+ 
+You need an OpenAI API key (used by the LLM calls and also by Mem0 embeddings).
+ 
+    export OPENAI_API_KEY="YOUR_KEY_HERE"
+ 
+Optional (model override):
+ 
+    export OPENAI_MODEL="gpt-4o-mini"
+ 
+### 2.2 (One-time) Bootstrap Mem0 memory
+ 
+This loads your seed memory documents (team context, glossary, historical CR patterns) into Mem0.
+ 
+    python -m scripts.memory_bootstrap_mem0
+ 
+(Optional) Validate memory retrieval:
+ 
+    python -m scripts.memory_test_mem0
+ 
+Mem0 is used as the memory store as per your workflow’s memory concept: team context, glossary/rubrics, and historical CR patterns. 
+
+### 2.3 Run the end-to-end workflow demo
+ 
+    python -m scripts.run_demo
+ 
+The demo script runs the main workflow graph and prints:
+- a short run summary
+- a clean final estimate output (worktype/complexity/count)
  
 ---
  
-## What This System Does
+## 3) Inputs and outputs
  
-The system behaves like a junior engineer:
+### 3.1 Input format (JSON)
  
-- Reads requirement inputs (slides)
-- Structures them into organised data
-- Detects missing information
-- Generates clarification questions if needed
-- Produces effort estimates
-- Verifies and refines results
+The workflow expects an input JSON with:
+- target DM (optional but recommended)
+- functionality_description
+- slides[] (each slide has index/title/text)
  
+Example:
+ 
+    {
+      "target_dm": "HealthPlan DM",
+      "functionality_description": "User views and selects a plan",
+      "slides": [
+        { "slide_index": "S1", "title": "Plan Listing", "text": "User sees available plans." },
+        { "slide_index": "S2", "title": "Plan Selection", "text": "User selects a plan and data is retrieved from Health API." }
+      ]
+    }
+ 
+This mirrors the workflow’s assumption that requirements are provided via a deck (represented as text for this PoC). 
+ 
+### 3.2 Output format (final estimates)
+ 
+Final output is a list of effort groupings:
+ 
+    Worktype (Complexity x Count)
+    → Description
+ 
+Example:
+ 
+    Page (S x 1)
+    → View available health plans
+ 
+    Interface (S x 1)
+    → Retrieve plan data from Health API
+ 
+    Component (M x 1)
+    → Implement backend capability for plan selection
+ 
+This matches the effort grouping format described in the project material.
 ---
  
-## Workflow
+## 4) Repo structure 
  
-The system follows this flow:
+Recommended Route:
  
-- Input
-- Extraction
-- Feedback loop (if required)
-- Generation
-- Final output
+1) src/schemas/state.py
+2) src/llm/client.py
+3) src/graphs/extraction/graph.py + routing.py
+4) src/graphs/generation/graph.py + routing.py
+5) src/graphs/main/graph.py + routing.py
+6) src/memory/mem0_client.py
+7) scripts/run_demo.py
  
----
- 
-## Project Structure
+Directory overview:
  
     src/
+      schemas/
+        state.py
+      llm/
+        client.py
       graphs/
         extraction/
           nodes/
-            ingest.py
-            structure_scope.py
-            artefacts_flows.py
-            systems_interfaces.py
-            variant_axes.py
-            backend_ipo.py
-            synth_unknowns.py
-            pfr_merge.py
-            readiness_big3.py
-            feedback_template.py
           routing.py
           graph.py
- 
         generation/
           nodes/
-            scope_filter.py
-            impacts_ui.py
-            impacts_interfaces.py
-            impacts_backend.py
-            groupings_seta.py
-            correct_setb.py
-            verify_cove.py
-            finalize_setc.py
           routing.py
           graph.py
- 
         main/
           routing.py
           graph.py
- 
         checkpoints.py
         node_utils.py
- 
-      llm/
-        client.py
- 
-      schemas/
-        state.py
- 
-      utils/
-        logger.py
+      memory/
+        mem0_client.py
  
     scripts/
       run_demo.py
+      memory_bootstrap_mem0.py
+      memory_test_mem0.py
  
     data/
       samples/
-        sample_input_incomplete.json
-        sample_input_minimal.json
-        sample_answers.md
+      memory_seed/
  
     tests/
+      conftest.py
       unit/
  
 ---
  
-## Setup
+## 5) Conceptual Understanding of each Phase
  
-Create virtual environment:
+### 5.1 Extraction Phase (slides → truth pack + readiness)
  
-    python3 -m venv venv
-    source venv/bin/activate
+Extraction decomposes requirements into:
+- structure/scope (DM, functionalities, FCUs)
+- artefacts and flows
+- systems and interfaces
+- variant axes
+- backend I/P/O capabilities
+- synthesis + explicit unknowns
+- readiness assessment
+- feedback questions if incomplete
  
-Install dependencies:
+This corresponds to the extraction steps described in your workflow spec. 
  
-    pip install -r requirements.txt
+### 5.2 Generation phase (truth pack → Set A → Set B → verify → Set C)
  
-Set OpenAI API key:
+Generation does:
+- scope filter (select relevant slice of truth pack)
+- derive impacts (UI / interface / backend)
+- Set A (initial draft effort groupings)
+- Set B (correction/consolidation)
+- CoVE verification (PASS/FAIL)
+- finalize Set C output
  
-    export OPENAI_API_KEY="YOUR_API_KEY"
- 
-(Optional)
- 
-    export OPENAI_MODEL="gpt-4o-mini"
- 
----
- 
-## Running the Demo
- 
-Run:
- 
-    python -m scripts.run_demo
- 
-This will:
-- Run a first pass using input JSON
-- Then simulate a resume flow using answers
+This corresponds to the generation steps described in your workflow spec.
  
 ---
  
-## Sample Input (Minimal)
+## 6) Memory (Mem0) 
  
-    {
-      "target_dm": "HealthPlan DM",
-      "project_description": "Enhancement to health plan portal",
-      "functionality_description": "User views plan details and selects a plan",
-      "slides": [
-        {
-          "slide_index": "S1",
-          "title": "Plan Listing Page",
-          "text": "User sees a list of available plans"
-        },
-        {
-          "slide_index": "S2",
-          "title": "Selection",
-          "text": "User selects a plan and details are retrieved"
-        }
-      ]
-    }
+This repo uses Mem0 to store and retrieve three memory partitions:
  
-Expected:
-- Goes directly to generation
-- Produces final estimation output
+- team_context
+  - canonical system names, acronyms, terminology conventions
+- worktype_glossary
+  - worktype definitions and complexity rubric
+- historical_cr
+  - historical CR context used for sanity checks / ambiguity detection (not direct estimation)
+ 
+Seed documents are in:
+ 
+    data/memory_seed/
+      team_context.md
+      worktype_glossary.md
+      historical_crs.md
+ 
+Mem0 is configured explicitly in src/memory/mem0_client.py (so it does not use any default “future” model), and bootstrap scripts load the seed docs. Mem0 configuration follows the documented config override approach.
  
 ---
  
-## Sample Input (Triggers Feedback)
- 
-    {
-      "target_dm": "HealthPlan DM",
-      "functionality_description": "User views plan",
-      "slides": [
-        {
-          "slide_index": "S1",
-          "title": "Page",
-          "text": "User views something"
-        }
-      ]
-    }
- 
-Expected:
-- Extraction runs
-- Missing info detected
-- System pauses (AWAITING_USER)
- 
----
- 
-## Sample Answers
- 
-    ## Section 1 — QID Q1
- 
-    | Category | Question | Answer |
-    |---|---|---|
-    | Implementation | Which system provides data? | Health API |
- 
-Expected:
-- Answers merged
-- Extraction re-run
-- Generation triggered
- 
----
- 
-## Extraction Nodes
- 
-These convert raw input into structured data.
- 
-- ingest_inputs
-  - Validates inputs
- 
-- structure_scope
-  - Identifies DM, functionalities, FCUs
- 
-- artefacts_flows
-  - Extracts UI elements and flows
- 
-- systems_interfaces
-  - Identifies systems and integrations
- 
-- variant_axes
-  - Detects variations (user types, conditions)
- 
-- backend_ipo
-  - Extracts backend logic (Input, Process, Output)
- 
-- synth_unknowns
-  - Combines all extracted data
-  - Identifies gaps
- 
-- pfr_merge
-  - Applies user answers
- 
-- readiness_big3
-  - Determines READY or OPEN
- 
-- feedback_template
-  - Generates clarification questions
- 
----
- 
-## Generation Nodes
- 
-These create effort estimates.
- 
-- scope_filter
-  - Selects relevant data
- 
-- impacts_ui
-  - UI/frontend work
- 
-- impacts_interfaces
-  - Integration work
- 
-- impacts_backend
-  - Backend logic work
- 
-- groupings_seta
-  - Initial estimate
- 
-- correct_setb
-  - Refines estimate
- 
-- verify_cove
-  - Validates correctness
- 
-- finalize_setc
-  - Produces final output
- 
----
- 
-## Output Example
- 
-    Page (S x 1)
-    → View available plans
- 
-    Interface (S x 1)
-    → Retrieve data from API
- 
-    Component (M x 1)
-    → Backend processing
- 
----
- 
-## Testing
+## 7) Tests
  
 Run tests:
  
     pytest -q
  
-Includes:
-- Node tests
-- Graph tests
-- Mocked LLM calls
+Tests are written to avoid calling the real LLM by mocking LLMClient, and include:
+- node-level tests (extraction + generation)
+- graph-level tests (subgraphs + main graph)
  
 ---
  
-## Logging
+## 8) Documentation
  
-The system logs:
-- node execution
-- key inputs/outputs
-- routing decisions
+- [DESIGN.md](./docs/DESIGN.md) explains architecture, routing logic, and node interactions in detail.
+- [CONFIGURATION.md](./docs/CONFIGURATION.md) provides details for all configurable knobs (model, memory seeds, demo inputs, iteration/retry caps, logging).
  
-This helps debugging and demos.
- 
----
- 
-## Demo Tips
- 
-To show feedback loop:
-- run incomplete input
-- show pause
-- then resume with answers
- 
-To show full pipeline:
-- run minimal input
-- show final output
- 
----
- 
-## Summary
- 
-This project demonstrates a production-style GenAI workflow with:
- 
-- Structured reasoning
-- Multi-step execution
-- Feedback loops
-- Verification mechanisms
-- Real-world engineering practices
