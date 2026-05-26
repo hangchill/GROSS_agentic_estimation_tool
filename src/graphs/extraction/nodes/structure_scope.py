@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from src.graphs.node_utils import add_event, slides_to_text
 from src.llm.client import LLMClient
+from src.memory.mem0_client import (
+    search_team_context,
+)
+from src.memory.utils import mem_results_to_text
 from src.schemas.state import GrossState
 from src.utils.logger import get_logger
 
@@ -13,6 +17,9 @@ You are a Senior Product Analyst and Systems Architect.
 Task:
 Extract high-level structure and scope from CR requirement slide text.
  
+Follow naming conventions: 
+{memory_text}
+
 Rules:
 - Do not invent functionality.
 - Use only the provided slide text.
@@ -101,8 +108,13 @@ Return JSON:
   "unknowns": []
 }}
 """
+    mem = search_team_context("terminology naming convention FCU System naming", 3)
 
-    result = LLMClient().json_call(SYSTEM_PROMPT, user_prompt)
+    memory_text = mem_results_to_text(mem)
+
+    populated_system_prompt = SYSTEM_PROMPT.format(memory_text=memory_text)
+
+    result = LLMClient().json_call(populated_system_prompt, user_prompt)
 
     truth_pack = state.setdefault("truth_pack", {})
     truth_pack["structure_scope"] = result
