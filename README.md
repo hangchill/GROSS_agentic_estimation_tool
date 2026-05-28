@@ -206,4 +206,5 @@ Tests are written to avoid calling the real LLM by mocking LLMClient, and includ
  
 - [DESIGN.md](./docs/DESIGN.md) explains architecture, routing logic, and node interactions in detail.
 - [CONFIGURATION.md](./docs/CONFIGURATION.md) provides details for all configurable knobs (model, memory seeds, demo inputs, iteration/retry caps, logging).
+- [WORKFLOW_TRACE.md](./docs/WORKFLOW_TRACE.md) provides a detailed example of how data flows through the nodes and the various paths an input can take. 
  
