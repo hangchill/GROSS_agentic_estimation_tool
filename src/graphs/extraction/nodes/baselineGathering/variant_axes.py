@@ -10,6 +10,8 @@ logger = get_logger(__name__)
 SYSTEM_PROMPT = """
 You are extracting variant axes from CR requirement slides.
  
+A variant axis represents a dimension of variation across FCUs. It indicates where and how different FCUs diverge. 
+
 A valid variant axis exists only if the slides show different:
 - UI artefact instances
 - user flows
@@ -22,6 +24,10 @@ Allowed divergence labels:
 - FlowDivergence
 - InterfaceDivergence
 - RuleDivergence
+
+For each axis, identify the variant value(s). 
+
+Example for Variant Value : If an FCU requires a screen serving the same purpose to be implemented but with different page titles, the axis could be "Page Title" with values "Title A" and "Title B". 
  
 Return JSON only.
 """

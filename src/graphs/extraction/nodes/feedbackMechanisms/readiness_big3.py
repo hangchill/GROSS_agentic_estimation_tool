@@ -9,7 +9,7 @@ logger = get_logger(__name__)
 
 def readiness_big3(state: GrossState) -> GrossState:
     """
-    Assess readiness based on blocking unknowns.
+    Assess readiness based on fields that are unknowns.
 
     Writes:
         - state["readiness"]

@@ -11,6 +11,9 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# Number 1 : ID functionality, FCUs under a DM  & the description of each
+### Identify high level points for a DM
+
 SYSTEM_PROMPT = """
 You are a Senior Product Analyst and Systems Architect.
  
@@ -21,9 +24,15 @@ Follow naming conventions:
 {memory_text}
 
 Rules:
+- Group functionalities and FCUs (Feature Control Units) by the DM (Demand Module) they belong to.
 - Do not invent functionality.
 - Use only the provided slide text.
-- Identify functionalities and FCUs in first-seen order.
+- Identify functionalities and FCUs in first-seen order in the slide ordering. 
+- For each Functionality or FCU, 
+    - Produce a summary or description that captures its essence and purpose.
+    - Allocate a unique ID (e.g. F1, F2 for functionalities, FCU1, FCU2 for FCUs). 
+- FCUs should represent distinct feature or capability requirements that can be estimated separately, in order to produce the functionalilty
+- An FCU identified needs to be mapped to a identified functionality that it supports.  
 - Preserve slide references.
 - Return JSON only.
 """

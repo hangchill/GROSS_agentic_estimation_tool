@@ -7,13 +7,20 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+
+# Number 5 : For a FCU, extract/express the capability in terms of Input, Process and Output
+  # Functionality is made of FCUs: 
+  ## this step is done such that the user flow of the functionality is clearly mapped in terms of backend requirements
+
 SYSTEM_PROMPT = """
-Extract backend capabilities as black-box Input / Process / Output.
+Extract backend capabilities as black-box in terms of Input, Process and Output.
  
 Rules:
-- Keep capability-level.
+- Keep to capability-level.
 - Do not invent component names.
-- Link capability to artefact or flow it supports.
+- Link capability to the bigger picture user flow that it supports.
+- Preserve slide numbers for all references and evidence used to arrive at extracted information. 
+
 - Return JSON only.
 """
 

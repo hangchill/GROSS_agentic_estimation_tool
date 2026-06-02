@@ -11,6 +11,8 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# Number 3 : Interfaces for any data action needed for each FCU
+
 SYSTEM_PROMPT = """
 You are identifying systems and interfaces.
  
@@ -20,6 +22,7 @@ Use the following known system glossary and context:
 
 Rules:
 - One named system equals one interface entry unless explicitly stated otherwise.
+- For each distinct data or action involved, capture the FCU it supports and the interface required
 - Capture purpose and evidence.
 - Do not invent system names.
 - Return JSON only.

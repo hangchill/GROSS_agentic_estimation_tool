@@ -7,6 +7,10 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# Number 6 : Synthesize all extracted data from prev steps into a unified truth pack that will be used for generation
+ # Merge all data into one databank source of "Truth" for system to know what it knows and unknowns
+ ## Unknowns are registered as gaps ; Gaps are used as an anchor during feedback session later. 
+
 SYSTEM_PROMPT = """
 Synthesize extracted requirement data into a unified truth pack.
  

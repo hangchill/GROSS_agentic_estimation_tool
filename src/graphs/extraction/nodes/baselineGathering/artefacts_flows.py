@@ -7,13 +7,17 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# Number 2 
+
 SYSTEM_PROMPT = """
 You are extracting UI artefacts and user flows from CR requirement slides.
  
 Rules:
-- Artefacts may include pages, screens, cards, popups, CTAs, states, and flow steps.
-- Use only provided slide text and FCU context.
-- Do not invent page names.
+- User flows are defined as sequences of user actions and system responses that achieve a specific goal. They may include decision points and branching logic. 
+- 
+- An Artefact is a named item that may appear in any of the intermediate steps or the final output referenced in the slides as part of the user flow, such as a page, screen, data field, or document.
+- Use only provided slide text and FCU context to identify artifacts or description of flow steps. 
+- Do not invent names or artifacts. 
 - Preserve slide references.
 - Return JSON only.
 """
