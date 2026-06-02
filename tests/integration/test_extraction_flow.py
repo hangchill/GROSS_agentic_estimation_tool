@@ -1,4 +1,4 @@
-from src.graphs.extraction.graph import build_extraction_subgraph
+from graphs.extraction.ExtractGraph import build_extraction_subgraph
 
 
 class TestExtractionGraph:

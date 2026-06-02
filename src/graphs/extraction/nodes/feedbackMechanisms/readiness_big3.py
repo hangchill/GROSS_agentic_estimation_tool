@@ -6,6 +6,8 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# Number 7 : readiness check Function to decide if we are ready to generate or need to ask more questions
+ # for a 
 
 def readiness_big3(state: GrossState) -> GrossState:
     """

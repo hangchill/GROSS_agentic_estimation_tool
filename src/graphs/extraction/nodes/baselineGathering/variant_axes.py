@@ -7,6 +7,9 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# Number 4 : Variant Axes ie variation points of a FCU 
+### Detail Collection for FCU
+
 SYSTEM_PROMPT = """
 You are extracting variant axes from CR requirement slides.
  

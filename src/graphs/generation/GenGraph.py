@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from langgraph.graph import END, StateGraph
 
-from src.graphs.generation.nodes.correct_setb import correct_setb
-from src.graphs.generation.nodes.finalize_setc import finalize_setc
-from src.graphs.generation.nodes.groupings_seta import groupings_seta
-from src.graphs.generation.nodes.impacts_backend import impacts_backend
-from src.graphs.generation.nodes.impacts_interfaces import impacts_interfaces
-from src.graphs.generation.nodes.impacts_ui import impacts_ui
-from src.graphs.generation.nodes.scope_filter import scope_filter
-from src.graphs.generation.nodes.verify_cove import verify_cove
-from src.graphs.generation.routing import route_after_verification
+from graphs.generation.nodes.setGenerating.correct_setb import correct_setb
+from graphs.generation.nodes.setGenerating.finalize_setc import finalize_setc
+from graphs.generation.nodes.setGenerating.gen_setA import groupings_seta
+from graphs.generation.nodes.scopeSetting.backend_impacts import impacts_backend
+from graphs.generation.nodes.scopeSetting.interfaces_impacts import impacts_interfaces
+from graphs.generation.nodes.scopeSetting.frontend_impact import impacts_ui
+from graphs.generation.nodes.scopeSetting.scope_filter import scope_filter
+from graphs.generation.nodes.setGenerating.verify_cove import verify_cove
+from graphs.generation.GenRouting import route_after_verification
 from src.schemas.state import GrossState
 
 
@@ -43,6 +43,7 @@ def build_generation_subgraph():
     g.add_node("impacts_ui", impacts_ui)
     g.add_node("impacts_interfaces", impacts_interfaces)
     g.add_node("impacts_backend", impacts_backend)
+    g.add_node("")
     g.add_node("groupings_seta", groupings_seta)
     g.add_node("correct_setb", correct_setb)
     g.add_node("verify_cove", verify_cove)

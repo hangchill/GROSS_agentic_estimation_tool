@@ -11,8 +11,47 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+## Step 3 in setGeneration
+
+## Number 9 in overall generation 
+
+## After SetB obtained (Number )
+# CoVE : 
+  # 1. From Initial Response (ie Set B which is done already) 
+  # 2. Analyse and generate list of specific questions to verify the factual claims 
+#        i. Find the proof autonomously to support them 
+#       Claims in each effort grouping: 
+#      a.  "description": "..."
+#      b.  "worktype": "..."
+#      c. "complexity": "s/m/c"
+#      d.  "count": 1
+  
+  # 3. Answer verification questions independently  
+     
+  #     What is available to this independent agent 
+  #       i. "W/O relying on the previous context used" built up for the Set B Generation;
+  #        ie.   
+  #       ii. 
+
+  # 4. Set C: Revision of SetB by removing inaccuracies and applying the newly verified facts
+  #      to whichever grps in setB that failed CoVe questions. 
+
+
 SYSTEM_PROMPT = """
-Verify Set B effort groupings.
+Role: You are now a Expert Systems Architect.
+
+You are provided with: 
+1. Project Description
+2. Service
+3. Functionality description
+4. Set B (a proposed list of effort groupings that is required to implement the provided functionality description)
+5. 
+
+Objective: To be able to substantiate all claims made in each grouping in set B. 
+
+
+
+
 
 Reference these historical patterns:
 
@@ -26,6 +65,8 @@ Check:
 - non-invention
 
 Rules:
+- DO NOT INVENT ANYTHING in order to align to anything you try to substantiate.
+- Proof of valid substantiation must be supported and only be from the data available.     
 - Check if expected components are missing
 - Detect unusual or incomplete estimates
 - Do NOT copy from memory
@@ -37,7 +78,7 @@ Return JSON only.
 
 def verify_cove(state: GrossState) -> GrossState:
     """
-    Run CoVE-style verification on Set B.
+    Run CoVE-style verification on each grouping available in Set B.
 
     This node represents the "CoVE Verification" step.
 

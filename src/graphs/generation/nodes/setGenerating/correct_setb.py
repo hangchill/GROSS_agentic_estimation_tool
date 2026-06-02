@@ -7,10 +7,17 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+## Step 2 in setGeneration
+
+# Number 8 (after set A) 
+# Set B : Application of correction rules according to tech lead tendencies observed from sample data.  
+ ## bulk of CCoT part applied here... () 
+ ## And regeneration of descriptions to be capability-level instead of mechanism based. 
+
 SYSTEM_PROMPT = """
-Correct Set A into Set B.
+Correct Set A into Set B as needed, by applying correction rules on applicable cases. 
  
-Apply:
+Rules:
 - prevent over-decomposition
 - fix frontend vs backend count normalization
 - avoid inflating complexity instead of count

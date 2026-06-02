@@ -7,15 +7,27 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+
+# Number 1 : For ONE row in CRA, Identify the respective CORRECT functionality in truth pack to use as basis of generation later
+
 SYSTEM_PROMPT = """
 You are selecting the relevant extracted requirements for effort estimation.
  
+You are provided with: 
+1. Truth pack 
+2. User preference (could be empty) 
+
 Rules:
-- Use only the truth_pack.
-- Select FCUs, artefacts, interfaces, variants, and backend capabilities relevant
-  to the provided functionality description.
+- Use only the truth_pack and user preference (if available) 
+- Always keep in mind the project description as the guiding light for relevance when selecting information. 
+- Always try to select a subset of the truth_pack that is most relevant to the functionality description provided, rather than selecting everything. The goal is to narrow down to the most pertinent information for estimation.
 - Do not invent new requirements.
 - Return JSON only.
+
+Steps: 
+- First identify the specific functionality present in the truth_pack for a DM that best matches the provided functionality description
+- Then select the FCUs required to produce the functionality description as closely as specified provided, in order to produce the service.   
+- Return the 
 """
 
 
@@ -49,11 +61,21 @@ def scope_filter(state: GrossState) -> GrossState:
         GrossState: Updated workflow state.
     """
     user_prompt = f"""
-Functionality Description:
+
+Project Description: Get from the CRA excel (tab)
+{state.get("inputs", {}).get("project_description", "")}
+
+Service: Get from the CRA excel (rowwise)
+{state.get("inputs", {}).get("service", "")}
+
+Functionality Description: Get from CRA excel (rowwise)
 {state.get("inputs", {}).get("functionality_description", "")}
  
 Truth Pack:
 {state.get("truth_pack", {})}
+
+User Preference: 
+{state.get("user_preference")}
  
 Return JSON:
 {{

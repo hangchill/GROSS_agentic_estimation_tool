@@ -6,6 +6,12 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# Number 2 : Data perimeter from FCUs selected in Scope_filter node earlier
+  ## Systems_interfaces node in extractionGraph should have done this 
+  ## so this node is just reshaping each distinct interface into impact statements for later effort classification in Set A generation
+  ## Interface impact stmts needs to reference the system involved, data extracted and purpose of the data.  
+
+
 
 def impacts_interfaces(state: GrossState) -> GrossState:
     """

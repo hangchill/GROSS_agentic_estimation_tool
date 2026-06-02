@@ -7,10 +7,12 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# Number 2 
+# Number 2 : By indiv FCUs, 1) capture artifacts 2) Identify user flow step that it supports
+ # 3) Finally produce the overall user flow for a functionality
+### Detail Collection for FCU
 
 SYSTEM_PROMPT = """
-You are extracting UI artefacts and user flows from CR requirement slides.
+You are extracting UI artefacts and the overall user flow(s) from the CR requirement slides.
  
 Rules:
 - User flows are defined as sequences of user actions and system responses that achieve a specific goal. They may include decision points and branching logic. 

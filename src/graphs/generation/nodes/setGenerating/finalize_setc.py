@@ -7,8 +7,14 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# Step 4 in setGeneration 
+
+# Number 10 in Generation graph : Works on CoVe insights on setB items that failed verification...
+## 
+
 SYSTEM_PROMPT = """
-Finalise Set C development effort estimates.
+Produce Set C development effort estimates, by revising development effort groupings in Set B which failed the Verification
+using the details in the audit corrections.   
  
 Rules:
 - Use Set B and verification.
@@ -55,7 +61,7 @@ Verification:
  
 Return JSON:
 {{
-  "effort_final": [
+  "set_c": [
     {{
       "worktype": "...",
       "complexity": "s/m/c",

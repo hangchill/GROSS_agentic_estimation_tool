@@ -3,8 +3,9 @@ from typing import Any, Dict, List, Literal, Optional, TypedDict
 Phase = Literal[
     "INIT",
     "EXTRACTION",
-    "AWAITING_USER",
+    "AWAITING_USER_FEEDBACK",
     "GENERATION",
+    "AWAITING_USER_SATISFACTION", 
     "DONE",
     "TERMINATED_INSUFFICIENT_DATA",
 ]
@@ -58,7 +59,8 @@ class GrossState(TypedDict, total=False):
     set_a: List[Dict[str, Any]]
     set_b: List[Dict[str, Any]]
     verification: Dict[str, Any]
-    effort_final: List[Dict[str, Any]]
+    effort_final: List[Dict[str, Any]]   # Shared with Set C...
+    user_preference : List[str, Any]  # during feedback from user_satisfaction after estimates checked
 
     # Team memory / reusable context
     team_memory: List[Dict[str, Any]]

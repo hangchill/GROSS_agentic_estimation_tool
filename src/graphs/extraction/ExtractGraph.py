@@ -8,14 +8,14 @@ from graphs.extraction.nodes.baselineGathering.structure_scope import structure_
 from graphs.extraction.nodes.baselineGathering.artefacts_flows import artefacts_flows
 from graphs.extraction.nodes.baselineGathering.systems_interfaces import systems_interfaces
 from graphs.extraction.nodes.baselineGathering.variant_axes import variant_axes
-from graphs.extraction.nodes.baselineGathering.backend_ipo import backend_ipo
+from graphs.extraction.nodes.baselineGathering.backend_capabilities import backend_ipo
 from graphs.extraction.nodes.baselineGathering.synth_unknowns import synth_unknowns
 
 ## Feedback Nodes
-from src.graphs.extraction.nodes.readiness_big3 import readiness_big3
-from src.graphs.extraction.nodes.pfr_merge import pfr_merge
-from src.graphs.extraction.routing import route_after_readiness, route_after_synthesis
-from src.graphs.extraction.nodes.feedback_template import feedback_template
+from graphs.extraction.nodes.feedbackMechanisms.readiness_big3 import readiness_big3
+from graphs.extraction.nodes.feedbackMechanisms.pfr_merge import pfr_merge
+from graphs.extraction.ExtractRouting import route_after_readiness, route_after_synthesis
+from graphs.extraction.nodes.feedbackMechanisms.feedback_template import feedback_template
 
 
 from src.schemas.state import GrossState
@@ -26,12 +26,12 @@ def build_extraction_subgraph():
     Build the extraction subgraph.
 
     Extraction flow:
-        ingest_inputs
-        -> structure_scope
-        -> artefacts_flows
-        -> systems_interfaces
-        -> variant_axes
-        -> backend_ipo
+        ingest_inputs (Checks inputs ; uses ingestPPTX )
+        -> structure_scope (Scoping of Functionality, FCUs for a DM)
+        -> artefacts_flows (FCU : Identify artefacts and flows)
+        -> systems_interfaces (FCU : Identify data interfaces for a data action required)
+        -> variant_axes (FCU : Identify variant axes and values for variability in FCU)
+        -> backend_ipo 
         -> synth_unknowns
         -> (optional) pfr_merge
         -> readiness_big3

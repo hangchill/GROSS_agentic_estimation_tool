@@ -6,6 +6,8 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# Number 3 : Backend capabilities for relevant FCUs from scope_filter node. 
+## 
 
 def impacts_backend(state: GrossState) -> GrossState:
     """

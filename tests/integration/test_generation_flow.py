@@ -1,4 +1,4 @@
-from src.graphs.generation.graph import build_generation_subgraph
+from graphs.generation.GenGraph import build_generation_subgraph
 
 
 class TestGenerationGraph:

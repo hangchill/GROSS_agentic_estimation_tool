@@ -6,6 +6,7 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# Number 4 : UI/Frontend impact candidates derived from selected artefacts in scope filter node.
 
 def impacts_ui(state: GrossState) -> GrossState:
     """

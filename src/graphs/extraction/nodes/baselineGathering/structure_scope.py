@@ -13,12 +13,19 @@ logger = get_logger(__name__)
 
 # Number 1 : ID functionality, FCUs under a DM  & the description of each
 ### Identify high level points for a DM
+### DOES THE VISUAL VLM ANALYSIS of the inputs ingested. 
 
 SYSTEM_PROMPT = """
 You are a Senior Product Analyst and Systems Architect.
  
 Task:
-Extract high-level structure and scope from CR requirement slide text.
+Extract high-level structure and scope for each DM present in a set of CR requirement slides. 
+
+Context: 
+For each slide in the deck, you are provided with: 
+1. Raw markdown text, 
+2. an image of the whole slide (which may contain diagrams, tables, or other visual information that is not fully captured in the markdown text)
+3. Any Cropped images present in the slide, for a more detailed view of certain sections in the slide. (Mostly to capture the description/explanation of requirements since the whole slide image is reduced in pixel size and so details may not be legible). 
  
 Follow naming conventions: 
 {memory_text}
@@ -27,8 +34,8 @@ Rules:
 - Group functionalities and FCUs (Feature Control Units) by the DM (Demand Module) they belong to.
 - Do not invent functionality.
 - Use only the provided slide text.
-- Identify functionalities and FCUs in first-seen order in the slide ordering. 
-- For each Functionality or FCU, 
+- Identify functionalities and FCUs in first-seen order in the slides. 
+- Once a Functionality or FCU is identified,
     - Produce a summary or description that captures its essence and purpose.
     - Allocate a unique ID (e.g. F1, F2 for functionalities, FCU1, FCU2 for FCUs). 
 - FCUs should represent distinct feature or capability requirements that can be estimated separately, in order to produce the functionalilty

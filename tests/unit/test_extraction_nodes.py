@@ -1,13 +1,13 @@
-from src.graphs.extraction.nodes.artefacts_flows import artefacts_flows
-from src.graphs.extraction.nodes.backend_ipo import backend_ipo
-from src.graphs.extraction.nodes.feedback_template import feedback_template
-from src.graphs.extraction.nodes.ingest import ingest_inputs
-from src.graphs.extraction.nodes.pfr_merge import pfr_merge
-from src.graphs.extraction.nodes.readiness_big3 import readiness_big3
-from src.graphs.extraction.nodes.structure_scope import structure_scope
-from src.graphs.extraction.nodes.synth_unknowns import synth_unknowns
-from src.graphs.extraction.nodes.systems_interfaces import systems_interfaces
-from src.graphs.extraction.nodes.variant_axes import variant_axes
+from graphs.extraction.nodes.baselineGathering.artefacts_flows import artefacts_flows
+from graphs.extraction.nodes.baselineGathering.backend_capabilities import backend_ipo
+from graphs.extraction.nodes.feedbackMechanisms.feedback_template import feedback_template
+from graphs.extraction.nodes.baselineGathering.ingest import ingest_inputs
+from graphs.extraction.nodes.feedbackMechanisms.pfr_merge import pfr_merge
+from graphs.extraction.nodes.feedbackMechanisms.readiness_big3 import readiness_big3
+from graphs.extraction.nodes.baselineGathering.structure_scope import structure_scope
+from graphs.extraction.nodes.baselineGathering.synth_unknowns import synth_unknowns
+from graphs.extraction.nodes.baselineGathering.systems_interfaces import systems_interfaces
+from graphs.extraction.nodes.baselineGathering.variant_axes import variant_axes
 
 
 class TestExtractionNodes:

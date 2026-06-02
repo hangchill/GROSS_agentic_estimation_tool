@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from langgraph.graph import END, StateGraph
 
-from src.graphs.extraction.graph import build_extraction_subgraph
-from src.graphs.generation.graph import build_generation_subgraph
-from src.graphs.main.routing import route_after_extraction
+from graphs.extraction.ExtractGraph import build_extraction_subgraph
+from graphs.generation.GenGraph import build_generation_subgraph
+from graphs.main.MainRouting import route_after_extraction
 from src.schemas.state import GrossState
 from src.utils.logger import get_logger
 

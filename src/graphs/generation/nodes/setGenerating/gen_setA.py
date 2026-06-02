@@ -11,20 +11,46 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+
+## Step 1 in setGeneration
+
+
+# Number 7 POSSIBLY; AFTER functional objects/feature description statements are synthesized 
+#         - To assign worktype, complexity and count 
+## NOTE: 
+#   IN OG PROMPT: should be ChECKPOINTING after each step here (need to figure out how to do this)
+
+## NOTE to improve :  
+#   
+
 SYSTEM_PROMPT = """
 You are an Expert Technical Project Manager and Lead Systems Architect.
- 
-Generate Set A initial development effort groupings.
 
-Use the following worktype definitions and complexity rules:
- 
+You are provided with: 
+1. List of feature descriptions for assessment 
+2. Worktype definitions 
+3. Complexity definitions associated with each worktype 
+
+Task: 
+Generate Set A : ie. first generation of development effort groupings for each feature description provided in the   
+
+Use the following worktype definitions and complexity rules: 
 {memory_text}
+to infer the most likely worktype and complexity respectively. 
 
 Rules:
 - Use only generation scope and derived impacts.
 - Assign correct worktypes and complexity levels based on the provided memory of worktype definitions and complexity rules.
-- Descriptions must be capability-level, not implementation detail.
+- Count
+
 - Return JSON only.
+
+Steps: 
+For each feature description in the list you are provided with:  
+1. Determine worktype 
+2. Determine complexity 
+3. Determine the count (ie. number of instances at the assigned worktype-complexity classification) needed to implement the feature as described. 
+
 """
 
 
