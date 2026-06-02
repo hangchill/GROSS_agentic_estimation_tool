@@ -18,21 +18,6 @@ from docling.datamodel.document import PictureItem, TextItem
 import re
 
 from openai import OpenAI
-import fitz
-
-# from ...schema.state import (
-#     ExtractionState)
-
-
-
-# ## For extractionState pptx 
-# def get_pptx_path_from_state(state: ExtractionState) -> str:
-#     """ Helper function to retrieve the PPTX path from the state. """
-#     pptx_path = state.get("inputs", {}).get("requirement_input") or state.get("requirement_ppt")
-#     if not pptx_path:
-#         raise ValueError("requirement_input PPTX path is missing in state")
-#     return pptx_path
-
 
 def parse_text_from_pptx(pptx_path: str) -> List[Dict[str, Any]]:
     """Text extraction from pptx using docling.
@@ -242,6 +227,7 @@ def extract_flowchart_elements_with_docling(slides: List[Dict[str, Any]], pptx_p
 
 ## Handover information for VLMs analysis 
 # vlm used to analyse : minicpm-v, llama3.2-vision, llava:7b , qwen3-35b
+# no need vlm now, we doing the analysis in the various nodes
 
 def ensure_ollama_model_exists(model_name: str):
     """
@@ -412,17 +398,17 @@ Output a strict JSON object with this exact schema:
 
 
 
-def compile_pptx_slides(
-    pptx_path: str,
-    full_images_dir: str = "tmp/pptx_full_slides",
-    elements_dir: str = "tmp/pptx_visual_elements",
-    model_name: str = "llama3.2-vision",
-) -> List[Dict[str, Any]]:
-    """End-to-end helper to build Slides data structure (README schema)."""
-    slides = parse_text_from_pptx(pptx_path)
-    attach_full_images(slides=slides, pptx_path=pptx_path, output_dir=full_images_dir)
-    extract_flowchart_elements_with_docling(slides=slides, pptx_path=pptx_path, output_dir=elements_dir)
-    analyze_slide_visuals_with_local_vlm(slides=slides, model_name=model_name)
-    return slides
+# def compile_pptx_slides(
+#     pptx_path: str,
+#     full_images_dir: str = "tmp/pptx_full_slides",
+#     elements_dir: str = "tmp/pptx_visual_elements",
+#     model_name: str = "llama3.2-vision",
+# ) -> List[Dict[str, Any]]:
+#     """End-to-end helper to build Slides data structure (README schema)."""
+#     slides = parse_text_from_pptx(pptx_path)
+#     attach_full_images(slides=slides, pptx_path=pptx_path, output_dir=full_images_dir)
+#     extract_flowchart_elements_with_docling(slides=slides, pptx_path=pptx_path, output_dir=elements_dir)
+#     analyze_slide_visuals_with_local_vlm(slides=slides, model_name=model_name)
+#     return slides
 
 
