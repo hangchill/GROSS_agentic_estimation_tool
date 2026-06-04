@@ -109,8 +109,7 @@ flowchart TD
  
 ```mermaid
 flowchart TD
-A[ingest_inputs] --> B[structure_scope]
-A[ingest_inputs] --> B[structure_scope]
+    A[ingest_inputs] --> B[structure_scope]
     B --> C[artefacts_flows]
     C --> D[systems_interfaces]
     D --> E[variant_axes]
@@ -126,11 +125,16 @@ A[ingest_inputs] --> B[structure_scope]
     PM --> NFI{Needs feedback and iterations left?}
     
     NFI -->|No further feedback needed| UCE[user_check_extraction]
-    NFI -->|Need more feedback needed| FQ
+    
+    %% Using a longer arrow (3 hyphens) pushes this line wider to the side
+    NFI --->|Need more feedback needed| FQ
+    
     NFI -->|no more iterations left| TM[terminated]
     
     UCE -->|user ok| SGS[Start generation subgraph]
-    UCE -->|"user not okay (provides feedback of dissatisfaction)"| FQ
+    
+    %% Using an even longer arrow (4 hyphens) pushes this one out even further
+    UCE ---->|"user not okay (provides feedback of dissatisfaction)"| FQ
 ```
  
 ### 5.3 Generation Subgraph
@@ -150,7 +154,7 @@ flowchart TD
     J --> K{User satisfaction?}
     
     K -->|Yes| L[effort_computation]
-    K -->|No: user_satisfaction_feedback| A
+    K -->|No: User submits feedback on generated estimates via user_satisfaction_feedback| A
 
 ```
  
