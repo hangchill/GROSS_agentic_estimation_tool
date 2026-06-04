@@ -110,6 +110,7 @@ flowchart TD
 ```mermaid
 flowchart TD
 A[ingest_inputs] --> B[structure_scope]
+A[ingest_inputs] --> B[structure_scope]
     B --> C[artefacts_flows]
     C --> D[systems_interfaces]
     D --> E[variant_axes]
@@ -118,17 +119,18 @@ A[ingest_inputs] --> B[structure_scope]
         
     G --> TE[Team enhancement]
     
-    %% New flow starts here
     TE --> R1[readiness_big3]
     R1 --> FQ[feedback_questioning]
     FQ -->|received user answers| PM[pfr_merge]
     
     PM --> NFI{Needs feedback and iterations left?}
-    NFI --> R2{readiness_big3}
     
-    R2 -->|No further feedback needed| UCE[user_check_extraction]
-    R2 -->|Need more feedback needed| R1
-    R2 -->|no more iterations left| TM[terminated]
+    NFI -->|No further feedback needed| UCE[user_check_extraction]
+    NFI -->|Need more feedback needed| FQ
+    NFI -->|no more iterations left| TM[terminated]
+    
+    UCE -->|user ok| SGS[Start generation subgraph]
+    UCE -->|"user not okay (provides feedback of dissatisfaction)"| FQ
 ```
  
 ### 5.3 Generation Subgraph
