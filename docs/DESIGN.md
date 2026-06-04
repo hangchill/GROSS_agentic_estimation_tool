@@ -117,17 +117,18 @@ A[ingest_inputs] --> B[structure_scope]
     F --> G[synth_unknowns]
         
     G --> TE[Team enhancement]
-    TE --> H{Has user answers?}
     
-    H -->|Yes| I[pfr_merge]
-    H -->|No| J[readiness_big3]
-
-    I --> K{Needs feedback and iterations left?}
-    J --> K
-
-    K -->|Yes| L[feedback_template]
-    K -->|No| M[End]
-    L --> M
+    %% New flow starts here
+    TE --> R1[readiness_big3]
+    R1 --> FQ[feedback_questioning]
+    FQ -->|received user answers| PM[pfr_merge]
+    
+    PM --> NFI{Needs feedback and iterations left?}
+    NFI --> R2{readiness_big3}
+    
+    R2 -->|No further feedback needed| UCE[user_check_extraction]
+    R2 -->|Need more feedback needed| R1
+    R2 -->|no more iterations left| TM[terminated]
 ```
  
 ### 5.3 Generation Subgraph
