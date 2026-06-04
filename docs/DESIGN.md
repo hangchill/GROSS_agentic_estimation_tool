@@ -113,14 +113,15 @@ flowchart TD
     B --> C[artefacts_flows]
     C --> D[systems_interfaces]
     D --> E[variant_axes]
-    E --> F[backend_ipo]
+    E --> F[backend_capabilities]
     F --> G[synth_unknowns]
- 
-    G --> H{Has user answers?}
+        
+    G --> TE[Team enhancement]
+    TE --> H{Has user answers?}
+    
     H -->|Yes| I[pfr_merge]
     H -->|No| J[readiness_big3]
-    I --> J
- 
+
     J --> K{Needs feedback and iterations left?}
     K -->|Yes| L[feedback_template]
     K -->|No| M[End]
@@ -131,17 +132,21 @@ flowchart TD
  
 ```mermaid
 flowchart TD
-    A[scope_filter] --> B[impacts_ui]
-    B --> C[impacts_interfaces]
-    C --> D[impacts_backend]
-    D --> E[groupings_seta]
+    A[scope_filter] --> B[interface_impacts + RAG]
+    B --> C[backend_impacts + RAG]
+    C --> D[frontend_impacts + RAG]
+    D --> E[groupings_seta + RAG]
     E --> F[correct_setb]
     F --> G[verify_cove]
- 
-    G --> H{Verification failed and retries left?}
-    H -->|Yes| F
-    H -->|No| I[finalize_setc]
-    I --> J[End]
+    G --> H[finalize_setc]
+    
+    H --> I[ambiguity_resolver]
+    I --> J[checker_agent]
+    J --> K{User satisfaction?}
+    
+    K -->|Yes| L[effort_computation]
+    K -->|No: user_satisfaction_feedback| A
+
 ```
  
 ---
@@ -172,7 +177,7 @@ Nodes:
   - produces FCU registry with slide references
  
 - artefacts_flows
-  - extracts UI artefacts and flow steps
+  - extracts sw development artefacts and flow steps
  
 - systems_interfaces
   - extracts named systems, interface entries, and purposes
@@ -180,19 +185,20 @@ Nodes:
 - variant_axes
   - extracts variation axes and divergence types
  
-- backend_ipo
-  - extracts backend capabilities using Input/Process/Output black-box form
+- backend_capabilities
+  - extracts backend capabilities in terms of Input,Process,Output 
  
 - synth_unknowns
   - consolidates extraction outputs into a unified truth pack
   - registers unknowns explicitly
  
 - pfr_merge
-  - parses user answers and stores them into PFR
-  - applies answers to unknowns where possible
+  - parses user answers and stores them into PFR 
+  - applies answers to applicable detail categories (unknowns) where possible
  
 - readiness_big3
-  - sets READY/OPEN based on blocking unknowns
+  - evaluates details readiness in terms of 3 categories
+  - sets each of the 3 categories in all FCUs : READY/OPEN based on evaluation
  
 - feedback_template
   - generates bounded clarification questions for OPEN gaps
@@ -205,7 +211,7 @@ Generation follows the pipeline described in your workflow spec:
 - scope filter
 - impact analysis (UI, interface, backend)
 - Set A
-- correction (Set B)
+- correction based on tech lead preferences and common guidelines(Set B)
 - verification (CoVE)
 - final Set C 
  
@@ -222,13 +228,23 @@ Nodes:
  
 - correct_setb
   - consolidates and corrects Set A into Set B
-  - increments verification_attempts to avoid infinite loops
  
 - verify_cove
-  - verifies Set B and outputs PASS/FAIL + audits
+  - verifies Set B with independent LLM reasoning 
+  - outputs PASS/FAIL + audits
  
 - finalize_setc
-  - outputs final effort_final and sets phase = DONE
+  - integrates verification audits to make edits to Set B if needed  
+  - sets phase = DONE
+
+- ambiguity_checker
+
+- checker_agent 
+
+- user_satisfaction
+
+- effort_computation (man-days for this DM or CR for human review purposes)
+  - If this estimate is reasonable based on comparisons to historical CRs   
  
 ---
  

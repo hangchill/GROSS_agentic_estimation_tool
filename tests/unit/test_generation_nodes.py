@@ -3,7 +3,7 @@ from graphs.generation.nodes.setGenerating.finalize_setc import finalize_setc
 from graphs.generation.nodes.setGenerating.gen_setA import groupings_seta
 from graphs.generation.nodes.scopeSetting.backend_impacts import impacts_backend
 from graphs.generation.nodes.scopeSetting.interfaces_impacts import impacts_interfaces
-from graphs.generation.nodes.scopeSetting.frontend_impact import impacts_ui
+from graphs.generation.nodes.scopeSetting.frontend_impacts import impacts_ui
 from graphs.generation.nodes.scopeSetting.scope_filter import scope_filter
 from graphs.generation.nodes.setGenerating.verify_cove import verify_cove
 
