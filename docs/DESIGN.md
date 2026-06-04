@@ -210,7 +210,8 @@ Nodes:
   - sets each of the 3 categories in all FCUs : READY/OPEN based on evaluation
  
 - feedback_template
-  - generates bounded clarification questions for OPEN gaps
+  - reasons about FCUs with OPEN readiness status
+  - generates minimal clarification questions with greatest generation impact for user to answer in app 
  
 ---
  
