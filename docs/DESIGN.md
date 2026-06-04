@@ -109,7 +109,7 @@ flowchart TD
  
 ```mermaid
 flowchart TD
-    A[ingest_inputs] --> B[structure_scope]
+A[ingest_inputs] --> B[structure_scope]
     B --> C[artefacts_flows]
     C --> D[systems_interfaces]
     D --> E[variant_axes]
@@ -122,7 +122,9 @@ flowchart TD
     H -->|Yes| I[pfr_merge]
     H -->|No| J[readiness_big3]
 
-    J --> K{Needs feedback and iterations left?}
+    I --> K{Needs feedback and iterations left?}
+    J --> K
+
     K -->|Yes| L[feedback_template]
     K -->|No| M[End]
     L --> M
