@@ -11,14 +11,15 @@ logger = get_logger(__name__)
 # Number 5 : For a FCU, extract/express the capability in terms of Input, Process and Output
   # Functionality is made of FCUs: 
   ## this step is done such that the user flow of the functionality is clearly mapped in terms of backend requirements
+  ## Ensure the variety in backend capability is captured for all variant axis values for a FCU  
 
 SYSTEM_PROMPT = """
-Extract backend capabilities as black-box in terms of Input, Process and Output.
+Extract backend capabilities expected to be developed to complete the FCU in terms of the Input, Process and Output of the FCU. 
  
 Rules:
-- Keep to capability-level.
+- Capture the details for each category requested about the FCU. 
 - Do not invent component names.
-- Link capability to the bigger picture user flow that it supports.
+- Link capability to the bigger picture user flow that it supports and the artifacts linked to the FCU. 
 - Preserve slide numbers for all references and evidence used to arrive at extracted information. 
 
 - Return JSON only.

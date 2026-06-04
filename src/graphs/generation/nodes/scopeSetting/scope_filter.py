@@ -9,6 +9,7 @@ logger = get_logger(__name__)
 
 
 # Number 1 : For ONE row in CRA, Identify the respective CORRECT functionality in truth pack to use as basis of generation later
+ # NOTE : User preference is from the users feedback from ambiguity_resolver.py aand also user_satisfaction in the post generation phase...  
 
 SYSTEM_PROMPT = """
 You are selecting the relevant extracted requirements for effort estimation.
@@ -19,7 +20,7 @@ You are provided with:
 
 Rules:
 - Use only the truth_pack and user preference (if available) 
-- Always keep in mind the project description as the guiding light for relevance when selecting information. 
+- Always keep in mind the project description as the authoritative guide for evaluation of relevance of the selectd information. 
 - Always try to select a subset of the truth_pack that is most relevant to the functionality description provided, rather than selecting everything. The goal is to narrow down to the most pertinent information for estimation.
 - Do not invent new requirements.
 - Return JSON only.

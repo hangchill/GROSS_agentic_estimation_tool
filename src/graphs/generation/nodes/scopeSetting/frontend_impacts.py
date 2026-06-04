@@ -10,12 +10,12 @@ logger = get_logger(__name__)
 
 def impacts_ui(state: GrossState) -> GrossState:
     """
-    Derive UI/frontend impact candidates from selected artefacts.
+    Derive UI/frontend impact statements present in the scope identified.
 
     This node represents the "UI/Frontend Impact" step of the generation layer.
 
-    It does not call the LLM. Instead, it reshapes selected artefacts into a
-    simpler list of UI build impacts that later Set A generation can reason over.
+    It calls the LLM, to reshape details in FCUs that are present in the scope filter acquired earlier.  
+    into a list of workable UI impacts statements that later Set A generation can reason over (Effort classification of feature descriptions).
 
     Writes:
         - state["ui_impacts"]
@@ -26,8 +26,10 @@ def impacts_ui(state: GrossState) -> GrossState:
     Returns:
         GrossState: Updated workflow state.
     """
+
+    
     logger.info(
-        "[IMPACTS UI] Deriving UI/frontend build impacts from selected artefacts..."
+        "[IMPACTS UI] Deriving UI/frontend build impacts from FCUs..."
     )
     scope = state.get("generation_scope", {})
     artefacts = scope.get("selected_artefacts", [])

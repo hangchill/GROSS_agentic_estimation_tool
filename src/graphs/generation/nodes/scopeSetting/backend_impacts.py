@@ -11,12 +11,12 @@ logger = get_logger(__name__)
 
 def impacts_backend(state: GrossState) -> GrossState:
     """
-    Derive backend impact candidates from selected backend capabilities.
+    Derive backend impact statements from selected backend capabilities.
 
     This node represents the "Backend Impact" step of generation.
 
-    It reshapes backend capability records into simplified backend work impacts
-    that later Set A generation will classify into effort groupings.
+    It calls the LLM, to reshape details in FCUs that are present in the scope filter acquired earlier.  
+    into a list of workable UI impacts statements (feature descriptions) that later Set A generation can reason over (Effort classification of feature descriptions).
 
     Writes:
         - state["backend_impacts"]

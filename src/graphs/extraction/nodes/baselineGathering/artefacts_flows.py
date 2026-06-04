@@ -12,11 +12,10 @@ logger = get_logger(__name__)
 ### Detail Collection for FCU
 
 SYSTEM_PROMPT = """
-You are extracting UI artefacts and the overall user flow(s) from the CR requirement slides.
+You are extracting UI artefacts and the overall user flow(s) that the FCU supports, from the CR requirement slides.
  
 Rules:
 - User flows are defined as sequences of user actions and system responses that achieve a specific goal. They may include decision points and branching logic. 
-- 
 - An Artefact is a named item that may appear in any of the intermediate steps or the final output referenced in the slides as part of the user flow, such as a page, screen, data field, or document.
 - Use only provided slide text and FCU context to identify artifacts or description of flow steps. 
 - Do not invent names or artifacts. 

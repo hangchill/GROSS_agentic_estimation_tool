@@ -14,6 +14,12 @@ logger = get_logger(__name__)
  ## bulk of CCoT part applied here... () 
  ## And regeneration of descriptions to be capability-level instead of mechanism based. 
 
+## CCoT : In agentic development, we should impl. CCoT within the system prompt during gen_SetA. 
+
+## IGNORE THIS... (so after completion, in the future, it should be just A and B) 
+   # A : initial generation 
+   # B : Edits made to estimates based on Verification audit notes from verify_cove
+
 SYSTEM_PROMPT = """
 Correct Set A into Set B as needed, by applying correction rules on applicable cases. 
  
@@ -32,9 +38,6 @@ def correct_setb(state: GrossState) -> GrossState:
     Apply correction rules to produce Set B.
 
     This node represents the "CCoT Correction" / Set B step.
-
-    It also increments verification_attempts so the generation verification loop
-    cannot run forever.
 
     Expected output shape:
     {

@@ -14,15 +14,16 @@ logger = get_logger(__name__)
 # Number 3 : Interfaces for any data action needed for each FCU
 
 SYSTEM_PROMPT = """
-You are identifying systems and interfaces.
+You are identifying the corresponding systems and interfaces, 
  
 Use the following known system glossary and context:
  
 {memory_text}
 
+
+
 Rules:
-- One named system equals one interface entry unless explicitly stated otherwise.
-- For each distinct data or action involved, capture the FCU it supports and the interface required
+- For each distinct data or action  involved, reason the interface required
 - Capture purpose and evidence.
 - Do not invent system names.
 - Return JSON only.

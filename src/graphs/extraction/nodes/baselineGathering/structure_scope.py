@@ -18,17 +18,21 @@ logger = get_logger(__name__)
 SYSTEM_PROMPT = """
 You are a Senior Product Analyst and Systems Architect.
  
-Task:
+Objective:
 Extract high-level structure and scope for each DM present in a set of CR requirement slides. 
 
 Context: 
 For each slide in the deck, you are provided with: 
-1. Raw markdown text, 
+1. Raw markdown text 
 2. an image of the whole slide (which may contain diagrams, tables, or other visual information that is not fully captured in the markdown text)
 3. Any Cropped images present in the slide, for a more detailed view of certain sections in the slide. (Mostly to capture the description/explanation of requirements since the whole slide image is reduced in pixel size and so details may not be legible). 
  
-Follow naming conventions: 
+Follow naming conventions and glossary of any terms/acronyms you encounter: 
 {memory_text}
+
+Chain-of-Thought: 
+1. For each DM,Identify all functionalities in first seen order. 
+2. Identify FCUs   
 
 Rules:
 - Group functionalities and FCUs (Feature Control Units) by the DM (Demand Module) they belong to.

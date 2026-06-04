@@ -1,5 +1,7 @@
 ## Number 5/6 : DEFINITELY NEED THIS
 
+## would contain Functions that does the RAG against similar projects
+
 
 ### RAG Idea: 
 # a. Condition on:  Search mem0 DB for similar project (based on PD) 
@@ -11,6 +13,9 @@
 ## 1. After all impact statements generated based on truth pack
 ### Do the RAG to take effort groupings that are missing (kinda wack tho )
 
-## 2. During the respective impact statement synthesis nodes (interface, BE, FE) 
+## I CHOOSE 2. During the respective impact statement synthesis nodes (interface, BE, FE) 
 ### RAG should be ran beforehand to acquire the most expected feature descriptions 
     # then execute normal process as per usual ... 
+
+
+
