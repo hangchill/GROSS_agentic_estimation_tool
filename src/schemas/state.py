@@ -38,11 +38,17 @@ class GrossState(TypedDict, total=False):
     max_verification_attempts: int
 
     # Runtime input payload
-    inputs: Dict[str, Any]
-
+    inputs: Dict[str, Any]  # slides_path, CRA_path 
+    
     # Extraction outputs
-    truth_pack: Dict[str, Any]
+    inputs_parsed : List[Dict[str, Any]]  # [slide1, slide2, ..] 
+                                          # slide_number, raw_text, full_image_path, associated_visual_elems
+                                          # for a associated_visual_elem : elem_type, details (for vlm later), image_path, coords 
+
     fcu_registry: List[Dict[str, Any]]
+    
+    truth_pack: Dict[str, Any]  # Compiled source of truths
+
 
     # Readiness + feedback
     readiness: Dict[str, Any]
@@ -56,9 +62,13 @@ class GrossState(TypedDict, total=False):
     ui_impacts: List[Dict[str, Any]]
     interface_impacts: List[Dict[str, Any]]
     backend_impacts: List[Dict[str, Any]]
+
+
     set_a: List[Dict[str, Any]]
     set_b: List[Dict[str, Any]]
-    verification: Dict[str, Any]
+
+    verification: Dict[str, Any]  # CoVe notes to use in set C 
+   
     effort_final: List[Dict[str, Any]]   # Shared with Set C...
     user_preference : List[str, Any]  # during feedback from user_satisfaction after estimates checked
 

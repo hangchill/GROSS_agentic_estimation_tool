@@ -147,7 +147,7 @@ def render_pptx_slides_to_images(pptx_path: str, output_dir: str) -> Dict[int, s
 
     return full_slide_paths
 
-def attach_full_images(slides: List[Dict[str, Any]], pptx_path: str, output_dir: str) -> None:
+def extract_and_attach_full_images(slides: List[Dict[str, Any]], pptx_path: str, output_dir: str) -> None:
     """Mutates Slides in-place to attach full-slide rendered image paths."""
     full_slide_paths = render_pptx_slides_to_images(pptx_path=pptx_path, output_dir=output_dir)
     for slide in slides:
@@ -156,7 +156,13 @@ def attach_full_images(slides: List[Dict[str, Any]], pptx_path: str, output_dir:
             slide["full_image"] = full_slide_paths.get(slide_number)
 
 
-def extract_flowchart_elements_with_docling(slides: List[Dict[str, Any]], pptx_path: str, output_dir: str) -> None:
+def extract_and_append_flowchart_elements_with_docling(slides: List[Dict[str, Any]], pptx_path: str, output_dir: str) -> None:
+    """  
+    Extracts the images in each slide from the slides_data (list of metadata of slides)
+
+    
+    """
+    
     os.makedirs(output_dir, exist_ok=True)
 
     # Initialize the Converter using the native PowerPoint format option
@@ -170,6 +176,10 @@ def extract_flowchart_elements_with_docling(slides: List[Dict[str, Any]], pptx_p
     doc = result.document
 
     def get_slide_entry(slide_number: int) -> Optional[Dict[str, Any]]:
+        """
+        With the slide number of the docling item. 
+        Gets the specific slide in the list to append the data to  
+        """
         if slide_number < 1 or slide_number > len(slides):
             return None
         entry = slides[slide_number - 1]
@@ -180,17 +190,21 @@ def extract_flowchart_elements_with_docling(slides: List[Dict[str, Any]], pptx_p
                 return candidate
         return None
 
-    # 2. Iterate globally through ALL elements in the document
+    list = [] 
+    # 2. Iterate globally through ALL elements in the slides 
+
     for item, level in doc.iterate_items():
         # Safety check: skip items that don't have provenance (location) data
         if not item.prov:
             continue
             
+        # Checks if item is in the slide of interest 
         slide_number = item.prov[0].page_no
         slide_entry = get_slide_entry(slide_number)
         if not slide_entry:
             continue
-
+        
+        # Locates the specific item in the slides_data list to append the 
         associated_elements = slide_entry.get("associated_visual_elements")
         if not isinstance(associated_elements, list):
             slide_entry["associated_visual_elements"] = []
@@ -199,9 +213,18 @@ def extract_flowchart_elements_with_docling(slides: List[Dict[str, Any]], pptx_p
         # Extract Text (SmartArt text / textboxes)
         if isinstance(item, TextItem):
             if item.text and item.text.strip():
+                # Grab the bounding box for text
+                bbox = item.prov[0].bbox if item.prov else None
+                coords = {"l": float(bbox.l), 
+                          "t": float(bbox.t), 
+                          "r": float(bbox.r), 
+                          "b": float(bbox.b)} if bbox else None
+                
                 associated_elements.append({
                     "description": item.text.strip(),
+                    "details" : None,
                     "image_path": None,
+                    "coordinates": coords
                 })
 
         # Extract Pictures (screenshots/icons as images)
@@ -216,18 +239,31 @@ def extract_flowchart_elements_with_docling(slides: List[Dict[str, Any]], pptx_p
                 image_obj.save(image_path)
 
                 if hasattr(item, "text") and isinstance(item.text, str) and item.text.strip():
-                    description = item.text.strip()
+                    element_type = item.text.strip()
                 else:
-                    description = image_filename
-
+                    element_type = image_filename
+                
+                # Build the coordinates dict
+                coords = {"l": float(bbox.l), 
+                          "t": float(bbox.t), 
+                          "r": float(bbox.r), 
+                          "b": float(bbox.b)} if bbox else None
+                
                 associated_elements.append({
-                    "description": description,
+                    "element_type": element_type,
+                    "details" : None,
                     "image_path": image_path,
+                    "coordinates": coords
                 })
+
+
+
+
+
 
 ## Handover information for VLMs analysis 
 # vlm used to analyse : minicpm-v, llama3.2-vision, llava:7b , qwen3-35b
-# no need vlm now, we doing the analysis in the various nodes
+# no need vlm now, we doing the analysis in the various nodes (which also will be using the multimodal models)
 
 def ensure_ollama_model_exists(model_name: str):
     """
@@ -397,18 +433,60 @@ Output a strict JSON object with this exact schema:
             continue
 
 
+# @tool 
+def analyze_visual_crop_tool( 
+    anchor_context: str, 
+    crop_image_path: str, 
+    crop_element_type: str = "",
+) -> Dict[str, Any]:
+    """
+    Acts as the targeted tool for the agent. 
+    Analyzes a single UI crop using the macro context from the slide that this crop was obtained from.
+    """
 
-# def compile_pptx_slides(
-#     pptx_path: str,
-#     full_images_dir: str = "tmp/pptx_full_slides",
-#     elements_dir: str = "tmp/pptx_visual_elements",
-#     model_name: str = "llama3.2-vision",
-# ) -> List[Dict[str, Any]]:
-#     """End-to-end helper to build Slides data structure (README schema)."""
-#     slides = parse_text_from_pptx(pptx_path)
-#     attach_full_images(slides=slides, pptx_path=pptx_path, output_dir=full_images_dir)
-#     extract_flowchart_elements_with_docling(slides=slides, pptx_path=pptx_path, output_dir=elements_dir)
-#     analyze_slide_visuals_with_local_vlm(slides=slides, model_name=model_name)
-#     return slides
+    system_prompt = """
 
+    Role: You are an expert systems analyst specializing in identifying software features complexity
+    
+    Context: You are provided with the macro context of the parent slide, and one specific cropped image that you are to analyse. 
+    Goal: Describe exactly what this specific image is, in relation to the parent slide and what user action or system response it represents.
+    
+    Output a strict JSON object:
+    {
+      "element_type": "e.g., Data Table, Action Button, Form Field",
+      "image_description_details": "Detailed description of what it does based on the image."
+    }
+    """
+    
+    user_content = [
+        {"type": "text", "text": f"PARENT SLIDE CONTEXT:\n{anchor_context}"},
+        {"type": "text", "text": f"suspected crop type:\n{crop_element_type}"},
+        {"type": "text", "text": "Analyze this specific crop image:"}
+    ]
+    
+    try:
+        crop_b64 = encode_image_to_base64_with_resize(crop_image_path)
+        user_content.append({
+            "type": "image_url",
+            "image_url": {"url": f"data:image/jpeg;base64,{crop_b64}"}
+        })
+    except Exception as e:
+        return {"error": f"Could not process crop image: {e}"}
 
+    try:
+        response = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_content},
+            ],
+            temperature=0.1,
+            response_format={"type": "json_object"},
+        )
+        
+        raw_output = response.choices[0].message.content or ""
+        clean_json = re.sub(r'```json\n|\n```|```', '', raw_output).strip()
+        return json.loads(clean_json)
+        
+    except Exception as e:
+        return {"error": f"VLM inference failed: {str(e)}"}
